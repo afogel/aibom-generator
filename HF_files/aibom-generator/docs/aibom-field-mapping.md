@@ -144,19 +144,19 @@ Technical placement for CycloneDX emitters.
 | model_description | component | .description | 0..1 |
 | model_purl | component | .purl | 0..1 |
 | supplied_by | component | .supplier | 0..1 |
-| licenses | component | .licenses | 0..n |
-| model_download_url | component | externalReferences[type=distribution] | 0..n |
-| model_vcs_url | component | externalReferences[type=vcs] | 0..n |
+| licenses | component | .licenses | 0..* |
+| model_download_url | component | externalReferences[type=distribution] | 0..* |
+| model_vcs_url | component | externalReferences[type=vcs] | 0..* |
 | primary_purpose | modelCard | modelParameters.task | 0..1 |
-| type_of_model | modelCard | modelParameters.approach | 0..n |
-| hyperparameters | modelCard | modelParameters | 0..n |
-| performance_metrics | modelCard | quantitativeAnalysis | 0..n |
-| limitations | modelCard | technicalLimitations | 0..n |
+| type_of_model | modelCard | modelParameters.approach | 0..* |
+| hyperparameters | modelCard | modelParameters | 0..* |
+| performance_metrics | modelCard | quantitativeAnalysis | 0..* |
+| limitations | modelCard | technicalLimitations | 0..* |
 | energy_consumption | modelCard | environmentalConsiderations | 0..1 |
-| runtime_dependencies | BOM | dependencies[] | 0..n |
-| model_lineage | component | pedigree.ancestors | 0..n |
-| training_datasets | dataset | modelParameters.datasets | 0..n |
-| test_datasets | dataset | datasets + role tag | 0..n |
+| runtime_dependencies | BOM | dependencies[] | 0..* |
+| model_lineage | component | pedigree.ancestors | 0..* |
+| training_datasets | dataset | modelParameters.datasets | 0..* |
+| test_datasets | dataset | datasets + role tag | 0..* |
 
 [⬆ Back to top](#aibom-canonical-field--relationship-mapping)
 
