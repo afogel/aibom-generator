@@ -29,6 +29,8 @@ This document is **normative for data modeling**, not for code structure or scor
 
 - **Table 3** shows **SPDX 3.0 projection details** (graph-based, object + relationship oriented).
 
+Cardinality notation is normalized to UML-style (0..*) across all tables.
+
 Scoring, validation, and emitters operate on the **canonical model**, not directly on these tables.
 
 ---
