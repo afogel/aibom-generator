@@ -3,7 +3,10 @@ import logging
 from typing import Optional
 from ..models.service import AIBOMService
 from ..models.scoring import calculate_completeness_score
-from ..config import OUTPUT_DIR
+from ..models.scoring import calculate_completeness_score
+from ..config import OUTPUT_DIR, TEMPLATES_DIR
+import os
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +125,8 @@ class CLIController:
                         "sbom_count": 0,
                         "completeness_score": completeness_score,
                         "enhancement_report": primary_report or {},
-                        "result_file": "#"
+                        "result_file": "#",
+                        "static_root": "static" 
                     }
 
                     html_content = template.render(context)
@@ -131,7 +135,30 @@ class CLIController:
                         f.write(html_content)
                     
                     print(f"\n📄 HTML Report:\n   {html_output_file}")
-                    
+
+                    # Copy static assets
+                    try:
+                        # output_file_primary is e.g. sboms/model_id_ai_sbom.json
+                        # html_output_file is sboms/model_id_ai_sbom.html
+                        output_dir = os.path.dirname(html_output_file)
+                        # src/static relative to CLI execution root or module
+                        # Let's use absolute path relative to this file to be safe
+                        current_dir = os.path.dirname(os.path.abspath(__file__)) # src/controllers
+                        src_dir = os.path.dirname(current_dir) # src
+                        static_src = os.path.join(src_dir, "static")
+                        static_dst = os.path.join(output_dir, "static")
+                        
+                        if os.path.exists(static_src):
+                            if os.path.exists(static_dst):
+                                shutil.rmtree(static_dst)
+                            shutil.copytree(static_src, static_dst)
+                            # print(f"   - Static assets copied to: {static_dst}")
+                        else:
+                            logger.warning(f"Static source directory not found: {static_src}")
+
+                    except Exception as e:
+                        logger.warning(f"Failed to copy static assets: {e}")
+
                     # Model Description
                     if "components" in primary_aibom and primary_aibom["components"]:
                         description = primary_aibom["components"][0].get("description", "No description available")
