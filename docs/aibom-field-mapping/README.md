@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines a **shared, format-agnostic view of AI Bill of Materials (AIBOM) fields** and how they map to two commonly used AIBOM standardized formats:
+This document defines a **shared, language-agnostic view of AI Bill of Materials (AIBOM) fields** and how they map to two commonly used AIBOM standardized formats:
 
 - **[CycloneDX](https://cyclonedx.org/specification/overview/)**
 - **[SPDX](https://spdx.dev/use/specifications/)**
@@ -19,7 +19,7 @@ Those details live in a separate machine-readable mapping registry used by the g
 
 ## How to Read This Document
 
-- **Format-agnostic fields** describe *what information is captured*, independent of any specific AIBOM format.
+- **Language-agnostic fields** describe *what information is captured*, independent of AIBOM specifications (CDX/SPDX).
 - The **coverage table** shows where each field is represented in CycloneDX and SPDX, using links to the relevant specification sections.
 - Notes are used only where mapping is partial, or requires interpretation.
 
@@ -27,7 +27,7 @@ This document is meant for **overview and alignment**, not for prescribing inter
 
 ---
 
-## Supported Formats
+## Supported Languages
 
 - **[CycloneDX 1.7](https://cyclonedx.org/docs/1.7/json/)**
 - **[SPDX 3.0.1 (AI Profile)](https://spdx.github.io/spdx-spec/v3.0.1/model/AI/AI/)**
@@ -35,15 +35,15 @@ This document is meant for **overview and alignment**, not for prescribing inter
 
 ---
 
-## Format-Agnostic Field Definitions
+## Language-Agnostic Field Definitions
 
-The table below defines the **core AIBOM fields**, independent of format specification.
+The table below defines the **core AIBOM fields**, independent of specification (CDX/SPDX).
 
 These definitions are the foundation for both format mappings.
 
 ### Field Definitions
 
-| Format-Agnostic Field | Description | Expected Data | Typical Source |
+| Language-Agnostic Field | Description | Expected Data | Typical Source |
 |------|-------------|---------------|----------------|
 | Model name | Human-readable identifier of the AI model | string | Model metadata, model card |
 | Model version | Version identifier for the model | string | Model metadata |
@@ -80,7 +80,7 @@ Where possible, links point directly to the relevant specification section.
 
 ### Coverage Table
 
-| Format-Agnostic Field | CycloneDX 1.7 | SPDX 3.0.1 (AI Profile) | Notes |
+| Language-Agnostic Field | CycloneDX 1.7 | SPDX 3.0.1 (AI Profile) | Notes |
 |------------------------|---------------|------------------------|-------|
 | Model name | `component.name` | `AI.AIPackage.name` | Direct mapping |
 | Model version | `component.version` | `packageVersion` | Direct mapping |
