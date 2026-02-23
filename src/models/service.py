@@ -201,16 +201,34 @@ class AIBOMService:
             }]
         }
 
+    def _fetch_with_backoff(self, fetch_func, *args, max_retries=3, initial_backoff=1.0, **kwargs):
+        import time
+        for attempt in range(max_retries):
+            try:
+                return fetch_func(*args, **kwargs)
+            except Exception as e:
+                # e.g., huggingface_hub.utils.HfHubHTTPError
+                error_msg = str(e)
+                if "401" in error_msg or "404" in error_msg:  # Auth or not found don't retry
+                    raise e
+                if attempt == max_retries - 1:
+                    logger.warning(f"Final attempt failed for API call: {e}")
+                    raise e
+                
+                sleep_time = initial_backoff * (2 ** attempt)
+                logger.warning(f"API call failed: {e}. Retrying in {sleep_time} seconds...")
+                time.sleep(sleep_time)
+
     def _fetch_model_info(self, model_id: str) -> Dict[str, Any]:
         try:
-            return self.hf_api.model_info(model_id)
+            return self._fetch_with_backoff(self.hf_api.model_info, model_id)
         except Exception as e:
             logger.warning(f"Error fetching model info for {model_id}: {e}")
             return {}
 
     def _fetch_model_card(self, model_id: str) -> Optional[ModelCard]:
         try:
-            return ModelCard.load(model_id)
+            return self._fetch_with_backoff(ModelCard.load, model_id)
         except Exception as e:
             logger.warning(f"Error fetching model card for {model_id}: {e}")
             return None

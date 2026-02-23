@@ -120,7 +120,13 @@
                         <span class="property-name">Licenses:</span>
                         <span class="property-value">
                             {% for license in aibom.components[0].licenses %}
-                            <span class="tag">{{ license.license.id if license.license else 'Unknown' }}</span>
+                            <span class="tag">
+                                {% if license.license %}
+                                {{ license.license.id if license.license.id else license.license.name }}
+                                {% else %}
+                                Unknown
+                                {% endif %}
+                            </span>
                             {% endfor %}
                         </span>
                     </div>
@@ -255,7 +261,7 @@
                                         {% endif %}
                                     </td>
                                     <td><span class="field-tier tier-critical"></span> Critical</td>
-                                    <td>CDX</td>
+                                    <td>{{ completeness_score.field_types.get(field, 'Unknown') }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -305,13 +311,19 @@
                                     <td>{{ field }}</td>
                                     <td>
                                         {% if completeness_score.field_checklist.get(field, '').startswith('✔') %}
-                                        $.metadata.properties[name="{{ field }}"]
+                                        {% if field == 'primaryPurpose' %}
+                                        $.components[0].modelCard.modelParameters.task
+                                        {% elif field == 'suppliedBy' %}
+                                        $.components[0].supplier.name
+                                        {% else %}
+                                        $.components[0].modelCard.properties[name="{{ field }}"]
+                                        {% endif %}
                                         {% else %}
                                         Not found
                                         {% endif %}
                                     </td>
                                     <td><span class="field-tier tier-{{ tier.lower() }}"></span> {{ tier }}</td>
-                                    <td>AI</td>
+                                    <td>{{ completeness_score.field_types.get(field, 'Unknown') }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -377,7 +389,7 @@
                                         {% endif %}
                                     </td>
                                     <td><span class="field-tier tier-{{ tier.lower() }}"></span> {{ tier }}</td>
-                                    <td>CDX</td>
+                                    <td>{{ completeness_score.field_types.get(field, 'Unknown') }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -437,7 +449,12 @@
                                     <td>
                                         {% if completeness_score.field_checklist.get(field, '').startswith('✔') %}
                                         {% if field == 'typeOfModel' %}
-                                        $.metadata.properties[name="{{ field }}"]
+                                        $.components[0].modelCard.modelParameters.modelArchitecture
+                                        {% elif field in ['safetyRiskAssessment', 'modelExplainability',
+                                        'energyConsumption', 'energyQuantity', 'energyUnit', 'hyperparameter'] %}
+                                        $.components[0].modelCard.properties[name="{{ field }}"]
+                                        {% elif field == 'limitation' %}
+                                        $.components[0].modelCard.considerations.technicalLimitations
                                         {% else %}
                                         $.components[0].modelCard.{{ field }}
                                         {% endif %}
@@ -446,7 +463,7 @@
                                         {% endif %}
                                     </td>
                                     <td><span class="field-tier tier-{{ tier.lower() }}"></span> {{ tier }}</td>
-                                    <td>AI</td>
+                                    <td>{{ completeness_score.field_types.get(field, 'Unknown') }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -506,7 +523,7 @@
                                         {% endif %}
                                     </td>
                                     <td><span class="field-tier tier-{{ tier.lower() }}"></span> {{ tier }}</td>
-                                    <td>CDX</td>
+                                    <td>{{ completeness_score.field_types.get(field, 'Unknown') }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -763,8 +780,6 @@
                     <img src="{% if static_root %}{{ static_root }}{% else %}/static{% endif %}/images/genai_security_project_logo.webp"
                         alt="OWASP GenAI Security Project logo" style="height: 50px; margin-bottom: 15px;">
                 </a>
-                <p style="font-size: 14px; font-weight: 600; margin-bottom: 5px; color: #2c3e50;">OWASP GenAI Security
-                    Project</p>
                 <p style="font-size: 13px;">Follow us for updates:<br>
                     <a href="https://www.linkedin.com/company/owasp-top-10-for-large-language-model-applications/"
                         target="_blank" rel="noopener noreferrer" style="color: #3498db;">@OWASP GenAI Security
@@ -780,7 +795,6 @@
                             Repository</a></li>
                     <li><a href="https://github.com/GenAI-Security-Project/aibom-generator/issues"
                             target="_blank">Report Issue</a></li>
-                    <li><a href="https://genai.owasp.org/" target="_blank">OWASP GenAI</a></li>
                 </ul>
             </div>
 
@@ -794,9 +808,7 @@
             <!-- Column 4: Spread the Word -->
             <div class="footer-widget spread-col">
                 <h4>🗣️ Help Us Spread the Word</h4>
-                <p style="font-size: 13px;">If you find this tool useful, share it with your network! <br><a
-                        href="https://genai.owasp.org/" target="_blank" rel="noopener noreferrer"
-                        style="color: #3498db;">https://genai.owasp.org/</a></p>
+                <p style="font-size: 13px;">If you find this tool useful, share it with your network!</p>
                 <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://huggingface.co/spaces/GenAISecurityProject/OWASP-AIBOM-Generator"
                     target="_blank" rel="noopener noreferrer" class="social-share-btn-footer">
                     🔗 Share on LinkedIn

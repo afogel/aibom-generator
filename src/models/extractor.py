@@ -329,13 +329,7 @@ class EnhancedExtractor:
                     from ..utils.summarizer import LocalSummarizer
                     readme = context.get('readme_content')
                     if readme:
-                        # Clean README: Remove YAML frontmatter if present
-                        # Clean README: Remove common YAML frontmatter fields instead of risking deleting content blocks
-                        clean_readme = re.sub(r'^(license|language|datasets|tags|base_model|model_name|library_name|pipeline_tag|extra_gated_prompt):.*?$(?:\n\s*- .*$)*', '', readme, flags=re.MULTILINE | re.IGNORECASE)
-                        # Remove residual --- markers
-                        clean_readme = re.sub(r'(?m)^---$', '', clean_readme).strip()
-                        
-                        summary = LocalSummarizer.summarize(clean_readme)
+                        summary = LocalSummarizer.summarize(readme, model_id=context.get('model_id', ''))
                         if summary:
                             self.extraction_results[field_name] = ExtractionResult(
                                 value=summary,
@@ -764,10 +758,24 @@ class EnhancedExtractor:
             metadata['license'] = "NOASSERTION"
         return metadata
     
+    def _fetch_with_backoff(self, fetch_func, *args, max_retries=3, initial_backoff=1.0, **kwargs):
+        import time
+        for attempt in range(max_retries):
+            try:
+                return fetch_func(*args, **kwargs)
+            except Exception as e:
+                error_msg = str(e)
+                if "401" in error_msg or "404" in error_msg:  # Auth or not found don't retry
+                    raise e
+                if attempt == max_retries - 1:
+                    raise e
+                time.sleep(initial_backoff * (2 ** attempt))
+
     def _download_and_parse_config(self, model_id: str, filename: str) -> Optional[Dict[str, Any]]:
-        """Download and parse a configuration file from the model repository"""
+        """Download and parse a JSON config file from the model repository"""
+        import json
         try:
-            file_path = hf_hub_download(repo_id=model_id, filename=filename)
+            file_path = self._fetch_with_backoff(hf_hub_download, repo_id=model_id, filename=filename)
             with open(file_path, 'r') as f:
                 return json.load(f)
         except (RepositoryNotFoundError, EntryNotFoundError, json.JSONDecodeError):
@@ -780,7 +788,7 @@ class EnhancedExtractor:
         try:
             if model_card and hasattr(model_card, 'content'):
                 return model_card.content
-            readme_path = hf_hub_download(repo_id=model_id, filename="README.md")
+            readme_path = self._fetch_with_backoff(hf_hub_download, repo_id=model_id, filename="README.md")
             with open(readme_path, 'r', encoding='utf-8') as f:
                 return f.read()
         except Exception:

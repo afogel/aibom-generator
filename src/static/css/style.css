@@ -1080,6 +1080,12 @@ th {
     white-space: nowrap;
 }
 
+.category-table table th:nth-child(3),
+.category-table table td:nth-child(3) {
+    word-break: break-all;
+    overflow-wrap: break-word;
+}
+
 .category-table table th:nth-child(4),
 .category-table table td:nth-child(4) {
     width: 1%;

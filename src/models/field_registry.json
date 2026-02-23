@@ -892,9 +892,9 @@
       "weight": 2.0,
       "category": "component_model_card",
       "description": "Type or architecture of the model",
-      "jsonpath": "$.metadata.properties[?(@.name=='typeOfModel')].value",
+      "jsonpath": "$.components[0].modelCard.modelParameters.modelArchitecture",
       "aibom_generation": {
-        "location": "$.metadata.properties",
+        "location": "$.components[0].modelCard.modelParameters.modelArchitecture",
         "rule": "include_if_available",
         "source_fields": [
           "typeOfModel",
